@@ -37,7 +37,7 @@ from densepose.vis.densepose_results_textures import (
 )
 from densepose.vis.extractor import CompoundExtractor, DensePoseResultExtractor, create_extractor
 
-INFER_WITH_PRE_DEF_BBOX = 1
+INFER_WITH_PRE_DEF_BBOX = 0
 from detectron2.checkpoint import DetectionCheckpointer 
 from detectron2.data import (
     MetadataCatalog,

@@ -9,7 +9,7 @@ import torch
 from detectron2.utils.comm import get_world_size, is_main_process
 from detectron2.utils.logger import log_every_n_seconds
 
-INFER_WITH_PRE_DEF_BBOX = 1
+INFER_WITH_PRE_DEF_BBOX = 0
 
 class DatasetEvaluator:
     """
@@ -99,8 +99,8 @@ class DatasetEvaluators(DatasetEvaluator):
         return results
 
 #USE this def if INFER_WITH_PRE_DEF_BBOX is set.
-def inference_on_dataset(model, model_real, data_loader, evaluator): #function structure changed and added model_real
-# def inference_on_dataset(model, data_loader, evaluator):
+# def inference_on_dataset(model, model_real, data_loader, evaluator): #function structure changed and added model_real
+def inference_on_dataset(model, data_loader, evaluator):
     """
     Run model on the data_loader and evaluate the metrics with evaluator.
     Also benchmark the inference speed of `model.forward` accurately.
@@ -143,10 +143,10 @@ def inference_on_dataset(model, model_real, data_loader, evaluator): #function s
 
             if not INFER_WITH_PRE_DEF_BBOX:
                 outputs = model(inputs)
-            else: #UNCOMMENT THIS SECTION IF INFER_WITH_PRE_DEF_BBOX is set
-                with inference_context(model_real), torch.no_grad():
-                    outputs_real = model_real.inference(inputs)
-                outputs = model.inference(inputs, [outputs_real[0]["instances"]], do_postprocess=True)
+            # else: #UNCOMMENT THIS SECTION IF INFER_WITH_PRE_DEF_BBOX is set
+            #     with inference_context(model_real), torch.no_grad():
+            #         outputs_real = model_real.inference(inputs)
+            #     outputs = model.inference(inputs, [outputs_real[0]["instances"]], do_postprocess=True)
                 
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
