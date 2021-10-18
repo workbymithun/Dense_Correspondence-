@@ -20,6 +20,7 @@ from densepose import add_densepose_config
 from densepose.engine import Trainer
 from densepose.modeling.densepose_checkpoint import DensePoseCheckpointer
 
+INFER_WITH_PRE_DEF_BBOX_FOR_QUANT = 1
 
 def setup(args):
     cfg = get_cfg()
@@ -44,7 +45,14 @@ def main(args):
         DensePoseCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
             cfg.MODEL.WEIGHTS, resume=args.resume
         )
-        res = Trainer.test(cfg, model)
+        if INFER_WITH_PRE_DEF_BBOX_FOR_QUANT:
+            model_real = Trainer.build_model(cfg)
+            DensePoseCheckpointer(model_real, save_dir=cfg.OUTPUT_DIR).resume_or_load(
+            "model_final_0ed407.pkl", resume=args.resume
+            )
+            res = Trainer.test(cfg, model, model_real)
+        else:
+            res = Trainer.test(cfg, model)
         if cfg.TEST.AUG.ENABLED:
             res.update(Trainer.test_with_TTA(cfg, model))
         if comm.is_main_process():
